@@ -1,0 +1,18 @@
+{
+  "city": "nanjing",
+  "bbox": [
+    118.7,
+    31.92,
+    119.2,
+    32.22
+  ],
+  "utm_zone": 50,
+  "ghs_tile": "R6_C30",
+  "scene": "LC08_L2SP_120038_20210801_02_T1",
+  "scene_cloud_pct": 12.86,
+  "scene_datetime": "2021-08-01T02:37:25.454623Z",
+  "min_built": 0.05,
+  "priority": "heat",
+  "model": "rf",
+  "repeats": 30
+}

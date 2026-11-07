@@ -8,6 +8,7 @@
   "ndvi_threshold": 0.5077499870839853,
   "top_decile_cells": 96,
   "vulnerable_share_of_clean_top_pct": 68.8,
+  "model": "rf",
   "trees": 300,
   "seed": 7,
   "repeats": 30,

@@ -1,0 +1,18 @@
+{
+  "city": "shanghai",
+  "bbox": [
+    121.25,
+    31.05,
+    121.75,
+    31.35
+  ],
+  "utm_zone": 51,
+  "ghs_tile": "R6_C31",
+  "scene": "LC08_L2SP_118038_20210429_02_T1",
+  "scene_cloud_pct": 0.28,
+  "scene_datetime": "2021-04-29T02:24:34.432440Z",
+  "min_built": 0.05,
+  "priority": "heat",
+  "model": "rf",
+  "repeats": 30
+}

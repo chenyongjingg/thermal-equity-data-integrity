@@ -1,0 +1,18 @@
+{
+  "city": "zhengzhou",
+  "bbox": [
+    113.45,
+    34.55,
+    113.95,
+    34.85
+  ],
+  "utm_zone": 49,
+  "ghs_tile": "R6_C30",
+  "scene": "LC08_L2SP_124036_20210930_02_T1",
+  "scene_cloud_pct": 0.19,
+  "scene_datetime": "2021-09-30T03:01:38.640017Z",
+  "min_built": 0.05,
+  "priority": "heat",
+  "model": "rf",
+  "repeats": 30
+}

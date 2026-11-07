@@ -1,0 +1,18 @@
+{
+  "cells": 1222,
+  "vulnerable_cells": 277,
+  "pop_percentile": 70.0,
+  "ndvi_quantile": 0.5,
+  "top_fraction": 0.1,
+  "priority": "heat",
+  "ndvi_threshold": 0.35134837597320323,
+  "top_decile_cells": 122,
+  "vulnerable_share_of_clean_top_pct": 42.6,
+  "model": "rf",
+  "trees": 300,
+  "seed": 7,
+  "repeats": 30,
+  "sklearn_version": "1.8.0",
+  "numpy_version": "2.4.6",
+  "pandas_version": "3.0.3"
+}

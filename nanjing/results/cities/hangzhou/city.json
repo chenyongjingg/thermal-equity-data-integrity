@@ -1,0 +1,18 @@
+{
+  "city": "hangzhou",
+  "bbox": [
+    120.0,
+    30.15,
+    120.5,
+    30.45
+  ],
+  "utm_zone": 51,
+  "ghs_tile": "R6_C31",
+  "scene": "LC08_L2SP_119039_20210927_02_T1",
+  "scene_cloud_pct": 0.62,
+  "scene_datetime": "2021-09-27T02:31:54.960637Z",
+  "min_built": 0.05,
+  "priority": "heat",
+  "model": "rf",
+  "repeats": 30
+}

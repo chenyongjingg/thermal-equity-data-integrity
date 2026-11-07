@@ -5,7 +5,10 @@ abstract: >-
   Analysis code and derived data for a study of how illicit data markets
   distort AI-assisted urban forest planning: a proof-of-concept experiment on
   satellite-derived land surface temperature and gridded population for
-  Nanjing, China, and a synthetic replication.
+  Nanjing, China, a synthetic replication, and robustness runs that repeat the
+  experiment under four estimators, in eight Chinese cities, and under
+  alternative grid resolutions, seeds, vulnerable-set definitions and
+  planting budgets.
 type: software
 authors:
   - family-names: Xue
@@ -16,7 +19,7 @@ authors:
     given-names: Songze
 repository-code: "https://github.com/chenyongjingg/thermal-equity-data-integrity"
 license: MIT
-version: 0.2.0
+version: 0.3.0
 date-released: "2026-11-08"
 keywords:
   - urban forestry

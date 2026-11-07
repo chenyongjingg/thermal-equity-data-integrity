@@ -1,0 +1,18 @@
+{
+  "city": "hefei",
+  "bbox": [
+    117.1,
+    31.65,
+    117.6,
+    31.95
+  ],
+  "utm_zone": 50,
+  "ghs_tile": "R6_C30",
+  "scene": "LC08_L2SP_121038_20210605_02_T1",
+  "scene_cloud_pct": 2.7,
+  "scene_datetime": "2021-06-05T02:43:19.304827Z",
+  "min_built": 0.05,
+  "priority": "heat",
+  "model": "rf",
+  "repeats": 30
+}

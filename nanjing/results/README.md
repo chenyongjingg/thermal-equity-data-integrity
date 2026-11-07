@@ -13,6 +13,11 @@ in `../README.md`. No value in these tables was typed by hand.
 | `conditions_heat_m0.02_r30.csv`, `conditions_heat_m0.10_r30.csv` | urban-mask sensitivity reported in Section 4.4 (963 and 492 cells) |
 | `conditions_heat_x_pop_r30.csv` | priority = predicted heat × population; drop-out 0.0% and Jaccard 1.000 at every rate |
 | `Figure_3.png/.svg`, `Figure_4.png/.svg` | the manuscript figures, drawn from `conditions_heat_m0.05_r30.csv` |
+| `model_summary.csv` | **Table S2** — the same grid and protocol under four estimators (`model_*.csv` hold the full per-estimator condition tables, `draws_*.csv` the 30 draws behind every mean) |
+| `city_summary.csv`, `cities/<name>/` | **Table S3** — the protocol repeated in eight cities; each `cities/<name>/` holds the grid, the condition table, the draws and the scene metadata |
+| `sensitivity_summary.csv` (`outputs/sens_*`) | **Table S4** — 500 m and 2 km grids, seeds 13 and 21, two other vulnerable-set definitions, and planting budgets of the top 5% and 20% |
+| `uncertainty_nanjing.csv`, `uncertainty_nanjing_contrasts.csv` | **Table S5** — mean, SD and 95% interval over the 30 draws, and the Welch interval for directional minus random |
+| `Figure_S2.png/.svg`, `Figure_S2_source.csv` | **Figure S2** — the directional and random drop-out in the eight cities with 95% intervals |
 | `CHECKSUMS.txt` | MD5 of every CSV and JSON above (PNG/SVG are shipped but not summed: their bytes depend on the matplotlib and freetype versions) |
 
 ## Headline values (`conditions_heat_m0.05_r30.csv`)
@@ -31,6 +36,55 @@ in `../README.md`. No value in these tables was typed by hand.
 
 727 analysis cells, 162 vulnerable, clean top decile 73 cells of which 52.1% are
 vulnerable.
+
+## Robustness headline values (drop-out at 10% contamination, ΔT = 2 °C)
+
+Directional vs random, from `model_summary.csv` and `city_summary.csv`:
+
+| Estimator | Directional | Random |
+|---|---|---|
+| Random forest (the paper) | 35.2 | 9.0 |
+| Gradient boosting | 37.8 | 12.2 |
+| Ridge regression | 10.1 | 0.9 |
+| k-nearest neighbours | 29.3 | 5.3 |
+
+| City | Scene date | Directional | Random |
+|---|---|---|---|
+| Nanjing | 2021-08-01 | 35.2 | 9.0 |
+| Beijing | 2021-05-02 | 71.2 | 11.8 |
+| Shanghai | 2021-04-29 | 64.4 | 12.8 |
+| Zhengzhou | 2021-09-30 | 49.5 | 13.5 |
+| Wuhan | 2021-10-25 | 47.3 | 7.6 |
+| Hefei | 2021-06-05 | 41.0 | 9.3 |
+| Hangzhou | 2021-09-27 | 33.9 | 8.3 |
+| Xi'an | 2021-04-28 | 33.3 | 7.7 |
+
+The directional-minus-random gap at 10% is 25.6 to 59.4 percentage points
+across the eight cities, and its 95% interval excludes zero in every city
+(`uncertainty_cities_contrasts.csv`).
+
+Design choices, from `sensitivity_summary.csv` (10% contamination, ΔT = 2 °C):
+
+| Variant | Cells | Vulnerable | Directional | Random |
+|---|---|---|---|---|
+| 500 m grid | 3040 | 683 | 32.2 | 8.2 |
+| 2 km grid | 173 | 38 | 41.1 | 14.4 |
+| Seed 13 | 727 | 162 | 36.4 | 9.8 |
+| Seed 21 | 727 | 162 | 38.0 | 8.9 |
+| Vulnerable set P60 / NDVI 25th | 727 | 110 | 47.3 | 7.8 |
+| Vulnerable set P80 / NDVI 75th | 727 | 141 | 48.0 | 10.2 |
+| Budget = top 5% | 727 | 162 | 51.4 | 16.7 |
+| Budget = top 20% | 727 | 162 | 18.2 | 4.3 |
+
+The direction survives all eight; the directional-to-random ratio stays between
+2.9 and 6.1.
+
+Nanjing appears in the city table as a self-check, not as an extra result:
+`cities/nanjing/cells.csv` is byte-identical to `cells_m0.05.csv` and
+`cities/nanjing/conditions.csv` to `conditions_heat_m0.05_r30.csv`, so the city
+driver provably shares the protocol rather than reimplementing it. Beijing and Wuhan need their composition
+column read beside the drop-out: 8.0% and 27.3% of their clean top deciles are
+vulnerable, so the rate is computed on a small base.
 
 ## Platform
 

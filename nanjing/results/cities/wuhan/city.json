@@ -1,0 +1,18 @@
+{
+  "city": "wuhan",
+  "bbox": [
+    114.1,
+    30.4,
+    114.6,
+    30.7
+  ],
+  "utm_zone": 50,
+  "ghs_tile": "R6_C30",
+  "scene": "LC08_L2SP_123039_20211025_02_T1",
+  "scene_cloud_pct": 21.55,
+  "scene_datetime": "2021-10-25T02:56:44.493760Z",
+  "min_built": 0.05,
+  "priority": "heat",
+  "model": "rf",
+  "repeats": 30
+}

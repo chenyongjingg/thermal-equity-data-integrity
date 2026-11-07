@@ -51,8 +51,10 @@ def verify(directory, checksum_file):
             if not line:
                 continue
             digest, name = line.split(None, 1)
-            name = os.path.basename(name.strip().lstrip("*"))
-            path = os.path.join(directory, name)
+            name = name.strip().lstrip("*")
+            # keep sub-directories (results/cities/<name>/...); the basename
+            # would collapse every city file onto results/cells.csv
+            path = os.path.join(directory, name.replace("/", os.sep))
             if not os.path.exists(path):
                 print("FAIL missing {}".format(name))
                 bad += 1

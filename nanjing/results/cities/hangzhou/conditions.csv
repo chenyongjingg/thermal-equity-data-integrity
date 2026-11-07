@@ -1,0 +1,10 @@
+condition,contamination_pct,delta_t,dropout_pct,jaccard,spearman_rho,bias_vulnerable_c,repeats
+clean,0.0,0.0,0.0,1.0,0.69,0.01,1
+directional,5.0,2.0,20.3,0.809,0.65,-0.42,30
+directional,10.0,2.0,33.9,0.708,0.59,-0.84,30
+directional,15.0,2.0,53.4,0.577,0.53,-1.29,30
+random,5.0,2.0,5.4,0.9,0.69,-0.1,30
+random,10.0,2.0,8.3,0.842,0.68,-0.19,30
+random,15.0,2.0,11.2,0.811,0.68,-0.29,30
+directional,10.0,1.0,20.6,0.81,0.65,-0.41,30
+directional,10.0,3.0,45.3,0.629,0.52,-1.28,30

@@ -1,0 +1,18 @@
+{
+  "city": "xian",
+  "bbox": [
+    108.75,
+    34.15,
+    109.25,
+    34.45
+  ],
+  "utm_zone": 49,
+  "ghs_tile": "R6_C29",
+  "scene": "LC08_L2SP_127036_20210428_02_T1",
+  "scene_cloud_pct": 1.16,
+  "scene_datetime": "2021-04-28T03:19:24.571749Z",
+  "min_built": 0.05,
+  "priority": "heat",
+  "model": "rf",
+  "repeats": 30
+}

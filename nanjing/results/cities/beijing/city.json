@@ -1,0 +1,18 @@
+{
+  "city": "beijing",
+  "bbox": [
+    116.2,
+    39.75,
+    116.7,
+    40.05
+  ],
+  "utm_zone": 50,
+  "ghs_tile": "R5_C30",
+  "scene": "LC08_L2SP_123032_20210502_02_T1",
+  "scene_cloud_pct": 0.04,
+  "scene_datetime": "2021-05-02T02:53:03.162660Z",
+  "min_built": 0.05,
+  "priority": "heat",
+  "model": "rf",
+  "repeats": 30
+}

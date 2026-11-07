@@ -18,6 +18,7 @@ import argparse
 import json
 import os
 import sys
+import time
 import urllib.request
 
 import rasterio
@@ -49,11 +50,36 @@ def find_scene(bbox, start, end, proxy, max_cloud=100.0):
         feats = json.load(r).get("features", [])
     if not feats:
         raise SystemExit("no scene for {} in {}..{}".format(bbox, start, end))
+    feats = [f for f in feats if all(k in f.get("assets", {}) for k in BANDS)]
     feats.sort(key=lambda f: f["properties"].get("eo:cloud_cover", 100))
     keep = [f for f in feats if f["properties"].get("eo:cloud_cover", 100) <= max_cloud]
     if not keep:
         raise SystemExit("no scene below {}% cloud in {}..{}".format(max_cloud, start, end))
-    return keep[0]
+
+    # A scene can cover the box only partly (path/row geometry), which shows up
+    # later as a grid half full of missing cells.  Prefer the least cloudy
+    # scene whose footprint contains the whole box; fall back to the largest
+    # overlap, then to cloud cover alone.
+    try:
+        from shapely.geometry import box, shape as to_shape
+        target = box(*bbox)
+        scored = []
+        for f in keep:
+            geom = f.get("geometry")
+            cov = to_shape(geom).intersection(target).area / target.area if geom else 0.0
+            scored.append((cov, -f["properties"].get("eo:cloud_cover", 100), f))
+        scored.sort(key=lambda t: (t[0], t[1]), reverse=True)
+        best = scored[0]
+        if best[0] >= 0.999:
+            best[2]["_coverage"] = round(best[0], 3)
+            return best[2]
+        # no full-coverage scene: take the largest overlap among the cloudy set
+        best[2]["_coverage"] = round(best[0], 3)
+        print("warning: best scene covers {:.1%} of the box".format(best[0]), flush=True)
+        return best[2]
+    except ImportError:
+        keep[0]["_coverage"] = None
+        return keep[0]
 
 
 def token(proxy):
@@ -103,6 +129,7 @@ def main(argv=None):
     start = args.start or args.date or "2021-08-01"
     end = args.end or args.date or start
     feat = find_scene(query_bbox, start, end, args.proxy, args.max_cloud)
+    feat.setdefault("_coverage", None)
     tok = token(args.proxy)
     print("scene:", feat["id"], "cloud:", feat["properties"].get("eo:cloud_cover"))
 
@@ -117,14 +144,23 @@ def main(argv=None):
         url = href + ("&" if "?" in href else "?") + tok
         prefix = args.tag or feat["id"]
         out = os.path.join(args.outdir, "{}__{}.tif".format(prefix, band))
-        shape = crop(url, query_bbox, out, gdal_opts)
+        for attempt in range(4):
+            try:
+                shape = crop(url, query_bbox, out, gdal_opts)
+                break
+            except Exception as exc:          # transient TLS/CURL handshake
+                if attempt == 3:
+                    raise
+                print("retry", attempt + 1, "after:", str(exc)[:120], flush=True)
+                time.sleep(5 * (attempt + 1))
         print("wrote", out, shape)
 
     meta_name = "landsat_scene.json" if not args.tag else "scene_{}.json".format(args.tag)
     with open(os.path.join(args.outdir, meta_name), "w", encoding="utf-8") as fh:
         json.dump({"id": feat["id"], "cloud_cover_pct": feat["properties"].get("eo:cloud_cover"),
                    "datetime": feat["properties"].get("datetime"),
-                   "bbox": query_bbox, "search": [start, end]}, fh, indent=2)
+                   "bbox": query_bbox, "search": [start, end],
+                   "footprint_coverage": feat.get("_coverage")}, fh, indent=2)
     return 0
 
 

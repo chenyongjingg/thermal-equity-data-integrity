@@ -57,6 +57,12 @@ or run the whole reported matrix — three urban-mask definitions and the
 population-weighted priority variant — with `sh nanjing/rerun_all.sh` from
 inside `nanjing/` (about 25 min, mostly random-forest fits).
 
+The robustness runs are separate drivers because they change one input at a
+time and cost real time: `sh run_models.sh` (four estimators, ~35 min),
+`python run_cities.py` (eight cities, downloads one Landsat window per city),
+`python run_sensitivity.py` (six grid/seed/threshold configurations, ~2 h).
+Each is described in `nanjing/README.md`.
+
 ### What the reported run is
 
 | Setting | Value |
@@ -90,11 +96,25 @@ rate, because the ranking is dominated by population variance; that null result
 is reported in Section 4.4 and is in
 `nanjing/results/conditions_heat_x_pop_r30.csv`.
 
+### Robustness runs
+
+Four further sets of runs change one part of the design at a time. They are
+described in the Supplementary Materials of the paper and are all shipped here.
+
+| Check | What changes | Driver | Output |
+|---|---|---|---|
+| Estimator family | random forest → gradient boosting, ridge, k-nearest neighbours | `run_models.sh` | `model_summary.csv` (**Table S2**) |
+| Cities | the same protocol in seven further Chinese cities, scene chosen by footprint coverage | `run_cities.py` | `city_summary.csv`, `cities/` (**Table S3**), `Figure_S2` |
+| Grid, seeds and thresholds | 500 m and 2 km grids, estimator seeds 13 and 21, two other vulnerable-set definitions, planting budgets of the top 5% and 20% | `run_sensitivity.py` | `sensitivity_summary.csv` (**Table S4**) |
+| Draw-level uncertainty | 95% t intervals per condition, Welch intervals for directional minus random | `uncertainty.py` | `uncertainty_nanjing*.csv` (**Table S5**) |
+
 ## What is and is not in this repository
 
 - **Included:** all analysis code; the synthetic results; the Nanjing
   cell-level grid, condition tables, run metadata and figures under
-  `nanjing/results/`; the scene identification.
+  `nanjing/results/`; the scene identification; and the four robustness sets
+  (estimators, eight cities, design choices, draw-level intervals) with the
+  per-city grids and scene metadata under `nanjing/results/cities/`.
 - **Not included:** the raw satellite and population rasters — large, and better
   obtained from the providers, which keeps their provenance unambiguous.
   `data/raw/` is git-ignored.
@@ -114,6 +134,11 @@ is reported in Section 4.4 and is in
 | Urban-mask and priority sensitivities (§4.4) | `nanjing/results/conditions_heat_m0.02_r30.csv`, `conditions_heat_m0.10_r30.csv`, `conditions_heat_x_pop_r30.csv` |
 | Figure S1 (synthetic replication) | `synthetic/Figure_S1.png` |
 | Table S1 (per-seed results) | `synthetic/results_per_seed.csv` |
+| Table S2 (four estimators) | `nanjing/results/model_summary.csv` |
+| Table S3 (eight cities) | `nanjing/results/city_summary.csv` |
+| Figure S2 (cities, 95% intervals) | `nanjing/results/Figure_S2.png` |
+| Table S4 (resolution, seed, thresholds) | `nanjing/results/sensitivity_summary.csv` |
+| Table S5 (draw-level intervals and contrasts) | `nanjing/results/uncertainty_nanjing.csv`, `uncertainty_nanjing_contrasts.csv` |
 
 ## Reproducibility notes
 
@@ -133,8 +158,11 @@ is reported in Section 4.4 and is in
   depends on GDAL/rasterio resampling, the model on the scikit-learn version
   recorded in every `run_metadata_*.json`. The model stage, given the same
   `cells_*.csv`, is deterministic under the seed.
-- `Figure_S1.png` and `Figure_3/4.png` are not covered by the checksum files,
-  because PNG bytes depend on the matplotlib and freetype versions.
+- Figure PNG/SVG files are not covered by the checksum files, because their
+  bytes depend on the matplotlib and freetype versions. Within one environment
+  they are reproducible: `make_figures.py` and `make_city_figure.py` fix the SVG
+  hash salt and drop the embedded date, so two consecutive runs give identical
+  `Figure_3/4` and `Figure_S2` bytes (verified for both PNG and SVG).
 - `python run.py test` exercises the full Nanjing path on a 40 × 40 synthetic
   raster stack, so the code is testable without downloading anything. It checks
   the schema and the direction of the effect, not the paper's values — the test

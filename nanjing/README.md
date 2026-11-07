@@ -82,6 +82,40 @@ python make_figures.py --conditions outputs/conditions_heat_m0.05_r30.csv \
 `python run.py nanjing` (repository root) runs the same three steps from the
 `LST`, `RED`, `NIR`, `QA`, `POP` and `BUILT` environment variables.
 
+## Robustness runs
+
+Three checks change one part of the design each. All of them use the same
+contamination protocol and the same metrics, and all of them write into
+`outputs/` so that `pack_results.py` can commit the result.
+
+```bash
+# four estimators on the reported grid -> Table S2
+sh run_models.sh
+
+# the same protocol in seven further cities -> Table S3, Figure S2
+python run_cities.py --cities wuhan,hefei,hangzhou,shanghai,beijing,xian,zhengzhou \
+  --proxy http://127.0.0.1:7897 --repeats 30
+python summarise_cities.py --out outputs
+python make_city_figure.py --out outputs --outdir results
+
+# resolution, seed, vulnerable-set definition and planting budget -> Table S4
+python run_sensitivity.py --raw ../data/raw --out outputs --repeats 30
+python summarise_sensitivity.py --out outputs
+
+# draw-level intervals and the directional-minus-random contrast -> Table S5
+python uncertainty.py --draws outputs/draws_rf.csv outputs/draws_gbm.csv \
+  outputs/draws_ridge.csv outputs/draws_knn.csv --out outputs/uncertainty_nanjing.csv
+python uncertainty.py --per-file --draws outputs/city_*/draws.csv \
+  --out outputs/uncertainty_cities.csv
+python export_supplementary.py --work outputs --out supplementary
+```
+
+The other cities need their own Landsat bands and GHS tiles; `run_cities.py`
+fetches both. Their scene identifiers, dates and cloud cover are recorded in
+`outputs/city_<name>/city.json` and repeated in Table S3, because a city is
+compared against its own clean baseline and the date therefore does not need to
+match Nanjing.
+
 ## Outputs
 
 `conditions_*.csv` has one row per condition:
@@ -122,9 +156,12 @@ The tables the paper is built from are committed, with MD5 sums, in
 
 - Feature-level contamination (fabricated canopy polygons, suppressed sensor
   records). The pipeline shifts labels only.
-- Multi-city or multi-date replication.
 - Any estimate of how often contamination occurs, or of the temperature effect
   of the resulting reallocation.
+- A seasonally matched scene for every city. Each city is compared against its
+  own clean baseline, so the date affects the absolute temperature level but not
+  the directional-versus-random contrast; the scene dates are disclosed in
+  Table S3 so the reader can judge the spread.
 
 These are the extensions named in Section 6.3 of the paper.
 

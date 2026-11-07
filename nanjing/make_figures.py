@@ -41,13 +41,32 @@ plt.rcParams.update({
     "axes.spines.right": False,
     "savefig.dpi": 600,
     "svg.fonttype": "none",
+    # fixed salt: without it matplotlib derives the clip-path and marker ids
+    # from id(), so two runs of the same data produce different SVG bytes
+    "svg.hashsalt": "thermal-equity",
 })
+
+
+def _to_lf(path):
+    """Rewrite a text output with LF endings.
+
+    matplotlib opens the SVG in text mode, so on Windows the file arrives with
+    CRLF while the repository stores LF; without this the SVG shows up as
+    modified on every checkout even when nothing changed.
+    """
+    with open(path, "rb") as fh:
+        data = fh.read()
+    if b"\r\n" in data:
+        with open(path, "wb") as fh:
+            fh.write(data.replace(b"\r\n", b"\n"))
 
 
 def save_both(fig, path):
     fig.savefig(path, bbox_inches="tight", facecolor="white")
-    fig.savefig(path.rsplit(".", 1)[0] + ".svg", bbox_inches="tight",
-                facecolor="white")
+    svg = path.rsplit(".", 1)[0] + ".svg"
+    fig.savefig(svg, bbox_inches="tight", facecolor="white",
+                metadata={"Date": None})
+    _to_lf(svg)
     plt.close(fig)
 
 
