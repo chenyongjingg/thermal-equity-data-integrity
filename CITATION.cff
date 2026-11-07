@@ -1,0 +1,26 @@
+cff-version: 1.2.0
+message: "If you use this code or the derived data, please cite the paper and this repository."
+title: "thermal-equity-data-integrity"
+abstract: >-
+  Analysis code and derived data for a study of how illicit data markets
+  distort AI-assisted urban forest planning: a proof-of-concept experiment on
+  satellite-derived land surface temperature and gridded population for
+  Nanjing, China, and a synthetic replication.
+type: software
+authors:
+  - family-names: Xue
+    given-names: Ziying
+  - family-names: Chen
+    given-names: Yongjin
+  - family-names: Zhu
+    given-names: Songze
+repository-code: "https://github.com/chenyongjingg/thermal-equity-data-integrity"
+license: MIT
+version: 0.1.0
+date-released: "2026-11-07"
+keywords:
+  - urban forestry
+  - urban heat island
+  - data integrity
+  - green equity
+  - reproducible research

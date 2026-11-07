@@ -1,0 +1,29 @@
+# Parameters of the Nanjing run described in Section 4.4.
+# These are defaults for build_grid.py and model_and_poison.py; the Makefile
+# passes them explicitly so that a run is reproducible from the command line.
+
+bbox: [118.70, 31.92, 119.20, 32.22]   # W, S, E, N (EPSG:4326)
+crs: EPSG:32650                         # UTM zone 50N
+resolution_m: 1000
+min_built: 0.0                          # set > 0 to apply the built-up mask
+
+lst_scale: 0.00341802                   # Landsat C2 L2 ST_B10 DN -> K
+lst_offset: 149.0
+
+vulnerable:
+  population_percentile: 70
+  ndvi: median
+
+model:
+  estimator: random_forest
+  trees: 300
+  min_samples_leaf: 2
+  n_jobs: 1                             # do not change: reproducibility
+  seed: 7
+
+contamination:
+  rates: [0.05, 0.10, 0.15]
+  deltas_c: [1.0, 2.0, 3.0]
+  main_delta_c: 2.0
+
+top_fraction: 0.10

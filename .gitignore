@@ -1,0 +1,17 @@
+# raw data is never committed (see data/README.md)
+data/raw/
+*.tif
+*.TIF
+*.tar.gz
+*.zip
+
+# generated outputs (the directory is kept, its contents are not)
+nanjing/outputs/*
+!nanjing/outputs/.gitkeep
+synthetic/run*.log
+
+# python
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/

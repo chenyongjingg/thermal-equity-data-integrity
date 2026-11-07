@@ -1,0 +1,59 @@
+{
+  "endpoint": "https://earth-search.aws.element84.com/v1/search",
+  "query": {
+    "datetime": "2021-08-01T00:00:00Z/2021-08-01T23:59:59Z",
+    "bbox": [
+      118.7,
+      31.92,
+      119.2,
+      32.22
+    ],
+    "collection": "landsat-c2-l2"
+  },
+  "n_returned": 1,
+  "scenes": [
+    {
+      "id": "LC08_L2SP_120038_20210801_02_T1",
+      "datetime": "2021-08-01T02:37:25.454623Z",
+      "cloud_cover_pct": 12.86,
+      "platform": "landsat-8",
+      "wrs_path": "120",
+      "wrs_row": "038",
+      "collection_number": "02",
+      "processing_level": null,
+      "sun_elevation": 64.81180568,
+      "assets": {
+        "st_b10": "s3://usgs-landsat/collection02/level-2/standard/oli-tirs/2021/120/038/LC08_L2SP_120038_20210801_20210810_02_T1/LC08_L2SP_120038_20210801_20210810_02_T1_ST_B10.TIF",
+        "sr_b4": "s3://usgs-landsat/collection02/level-2/standard/oli-tirs/2021/120/038/LC08_L2SP_120038_20210801_20210810_02_T1/LC08_L2SP_120038_20210801_20210810_02_T1_SR_B4.TIF",
+        "sr_b5": "s3://usgs-landsat/collection02/level-2/standard/oli-tirs/2021/120/038/LC08_L2SP_120038_20210801_20210810_02_T1/LC08_L2SP_120038_20210801_20210810_02_T1_SR_B5.TIF"
+      },
+      "_asset_keys": [
+        "ang",
+        "atran",
+        "blue",
+        "cdist",
+        "coastal",
+        "drad",
+        "emis",
+        "emsd",
+        "green",
+        "lwir11",
+        "mtl.json",
+        "mtl.txt",
+        "mtl.xml",
+        "nir08",
+        "qa",
+        "qa_aerosol",
+        "qa_pixel",
+        "qa_radsat",
+        "red",
+        "reduced_resolution_browse",
+        "swir16",
+        "swir22",
+        "thumbnail",
+        "trad",
+        "urad"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+# Repository text is LF.  The generated CSVs are exempt from every
+# conversion: their MD5 sums are part of the reproducibility claim
+# (synthetic/CHECKSUMS.txt), so git must not touch their bytes.
+* text=auto eol=lf
+*.csv -text
+synthetic/CHECKSUMS.txt -text
+*.png -text
+*.tif -text
+*.TIF -text
