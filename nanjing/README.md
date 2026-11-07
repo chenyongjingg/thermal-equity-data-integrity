@@ -78,8 +78,10 @@ take from the output.
   retained 644 cells; check the printed count before comparing.
 - `--res` (grid size, default 1000 m).
 - `--seed` (label-sampling and forest seed).
-- The vulnerability thresholds (70th percentile, median NDVI) are constants in
-  `model_and_poison.py`; changing them changes both the vulnerable set and ρ.
+- The vulnerability thresholds — `--pop-percentile` (default 70),
+  `--ndvi-quantile` (default 0.5, the median) and `--top-fraction` (default
+  0.10) — change both the vulnerable set and ρ. The defaults are the ones used
+  in the paper.
 
 ## What this code does not do
 

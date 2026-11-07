@@ -55,6 +55,12 @@ def parse_args(argv=None):
     p.add_argument("--delta", nargs="+", type=float, default=[1.0, 2.0, 3.0])
     p.add_argument("--main-delta", type=float, default=2.0,
                    help="shift used for the contamination-rate sweep")
+    p.add_argument("--pop-percentile", type=float, default=POP_PERCENTILE,
+                   help="population percentile defining vulnerable cells")
+    p.add_argument("--ndvi-quantile", type=float, default=0.5,
+                   help="NDVI quantile defining vulnerable cells (0.5 = median)")
+    p.add_argument("--top-fraction", type=float, default=TOP_FRACTION,
+                   help="share of cells retained in the planting priority list")
     return p.parse_args(argv)
 
 
@@ -106,13 +112,13 @@ def main(argv=None):
     df["x_km"] = df["x_utm"] / 1000.0
     df["y_km"] = df["y_utm"] / 1000.0
 
-    pop_thr = np.percentile(df["pop"], POP_PERCENTILE)
-    ndvi_thr = np.median(df["ndvi"])
+    pop_thr = np.percentile(df["pop"], args.pop_percentile)
+    ndvi_thr = float(df["ndvi"].quantile(args.ndvi_quantile))
     vuln = ((df["pop"] >= pop_thr) & (df["ndvi"] <= ndvi_thr)).to_numpy()
     vuln_score = zscore(df["pop"].to_numpy()) - zscore(df["ndvi"].to_numpy())
 
     y = df["lst_c"].to_numpy()
-    top_n = int(round(TOP_FRACTION * len(df)))
+    top_n = int(round(args.top_fraction * len(df)))
 
     pred_clean = fit_predict(df, y, args.trees, args.seed)
     priority_clean = pred_clean * df["pop"].to_numpy()
@@ -167,7 +173,9 @@ def main(argv=None):
     meta = {
         "cells": int(len(df)),
         "vulnerable_cells": int(vuln.sum()),
-        "pop_percentile": POP_PERCENTILE,
+        "pop_percentile": args.pop_percentile,
+        "ndvi_quantile": args.ndvi_quantile,
+        "top_fraction": args.top_fraction,
         "ndvi_threshold": float(ndvi_thr),
         "top_decile_cells": int(top_n),
         "vulnerable_share_of_clean_top_pct": round(float(share_vuln_top), 1),
