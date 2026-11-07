@@ -47,7 +47,7 @@ Directional vs random, from `model_summary.csv` and `city_summary.csv`:
 | Random forest (the paper) | 35.2 | 9.0 |
 | Gradient boosting | 37.8 | 12.2 |
 | Ridge regression | 10.1 | 0.9 |
-| k-nearest neighbours | 29.3 | 5.3 |
+| k-nearest neighbors | 29.3 | 5.3 |
 
 | City | Scene date | Directional | Random |
 |---|---|---|---|

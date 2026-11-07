@@ -20,7 +20,7 @@ authors:
     given-names: Songze
 repository-code: "https://github.com/chenyongjingg/thermal-equity-data-integrity"
 license: MIT
-version: 0.3.1
+version: 0.3.2
 date-released: "2026-11-08"
 keywords:
   - urban forestry

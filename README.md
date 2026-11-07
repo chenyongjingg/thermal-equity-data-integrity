@@ -60,7 +60,7 @@ inside `nanjing/` (about 25 min, mostly random-forest fits).
 The robustness runs are separate drivers because they change one input at a
 time and cost real time: `sh run_models.sh` (four estimators, ~35 min),
 `python run_cities.py` (eight cities, downloads one Landsat window per city),
-`python run_sensitivity.py` (six grid/seed/threshold configurations, ~2 h).
+`python run_sensitivity.py` (eight grid, seed, threshold and budget configurations, ~2 h).
 Each is described in `nanjing/README.md`.
 
 ### What the reported run is
@@ -98,12 +98,12 @@ is reported in Section 4.4 and is in
 
 ### Robustness runs
 
-Four further sets of runs change one part of the design at a time. They are
+Five further sets of runs change one part of the design at a time. They are
 described in the Supplementary Materials of the paper and are all shipped here.
 
 | Check | What changes | Driver | Output |
 |---|---|---|---|
-| Estimator family | random forest → gradient boosting, ridge, k-nearest neighbours | `run_models.sh` | `model_summary.csv` (**Table S2**) |
+| Estimator family | random forest → gradient boosting, ridge, k-nearest neighbors | `run_models.sh` | `model_summary.csv` (**Table S2**) |
 | Cities | the same protocol in seven further Chinese cities, scene chosen by footprint coverage | `run_cities.py` | `city_summary.csv`, `cities/` (**Table S3**), `Figure_S2` |
 | Grid, seeds and thresholds | 500 m and 2 km grids, estimator seeds 13 and 21, two other vulnerable-set definitions, planting budgets of the top 5% and 20% | `run_sensitivity.py` | `sensitivity_summary.csv` (**Table S4**) |
 | Draw-level uncertainty | 95% t intervals per condition, Welch intervals for directional minus random | `uncertainty.py` | `uncertainty_nanjing*.csv` (**Table S5**) |
@@ -113,9 +113,9 @@ described in the Supplementary Materials of the paper and are all shipped here.
 
 - **Included:** all analysis code; the synthetic results; the Nanjing
   cell-level grid, condition tables, run metadata and figures under
-  `nanjing/results/`; the scene identification; and the four robustness sets
-  (estimators, eight cities, design choices, draw-level intervals) with the
-  per-city grids and scene metadata under `nanjing/results/cities/`.
+  `nanjing/results/`; the scene identification; and the five robustness sets
+  (estimators, eight cities, design choices, draw-level intervals, placebo arm)
+  with the per-city grids and scene metadata under `nanjing/results/cities/`.
 - **Not included:** the raw satellite and population rasters — large, and better
   obtained from the providers, which keeps their provenance unambiguous.
   `data/raw/` is git-ignored.
