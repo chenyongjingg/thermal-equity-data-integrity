@@ -107,6 +107,7 @@ described in the Supplementary Materials of the paper and are all shipped here.
 | Cities | the same protocol in seven further Chinese cities, scene chosen by footprint coverage | `run_cities.py` | `city_summary.csv`, `cities/` (**Table S3**), `Figure_S2` |
 | Grid, seeds and thresholds | 500 m and 2 km grids, estimator seeds 13 and 21, two other vulnerable-set definitions, planting budgets of the top 5% and 20% | `run_sensitivity.py` | `sensitivity_summary.csv` (**Table S4**) |
 | Draw-level uncertainty | 95% t intervals per condition, Welch intervals for directional minus random | `uncertainty.py` | `uncertainty_nanjing*.csv` (**Table S5**) |
+| Placebo arm | the same rate and shift aimed at the non-vulnerable complement | `model_and_poison.py --placebo-out` | `placebo_heat_m0.05_r30.csv` |
 
 ## What is and is not in this repository
 

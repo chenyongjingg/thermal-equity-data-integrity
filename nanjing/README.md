@@ -102,6 +102,13 @@ python make_city_figure.py --out outputs --outdir results
 python run_sensitivity.py --raw ../data/raw --out outputs --repeats 30
 python summarise_sensitivity.py --out outputs
 
+# placebo arm (same rate and shift, aimed at the non-vulnerable complement) is
+# written by rerun_all.sh through --placebo-out; to regenerate it alone:
+python model_and_poison.py --cells outputs/cells_m0.05.csv \
+  --out /tmp/conditions.csv --meta /tmp/run_metadata.json --repeats 30 \
+  --priority heat --placebo-out outputs/placebo_heat_m0.05_r30.csv \
+  --placebo-draws-out outputs/placebo_draws_heat_m0.05_r30.csv
+
 # draw-level intervals and the directional-minus-random contrast -> Table S5
 python uncertainty.py --draws outputs/draws_rf.csv outputs/draws_gbm.csv \
   outputs/draws_ridge.csv outputs/draws_knn.csv --out outputs/uncertainty_nanjing.csv

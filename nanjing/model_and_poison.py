@@ -73,6 +73,12 @@ def parse_args(argv=None):
     p.add_argument("--draws-out", default=None,
                    help="optional CSV with one row per contamination draw, for "
                         "confidence intervals and paired tests")
+    p.add_argument("--placebo-out", default=None,
+                   help="optional CSV for the placebo arm: the same rate and "
+                        "shift applied to the non-vulnerable complement, which "
+                        "is the same magnitude of corruption aimed elsewhere")
+    p.add_argument("--placebo-draws-out", default=None,
+                   help="optional draws behind --placebo-out")
     p.add_argument("--priority", choices=["heat_x_pop", "heat"], default="heat_x_pop",
                    help="planting priority: predicted LST times population "
                         "(heat_x_pop) or predicted LST alone (heat)")
@@ -172,21 +178,29 @@ def main(argv=None):
 
     draws = []
 
-    def run_condition(condition, rate, delta):
+    def run_condition(condition, rate, delta, sink=None):
+        # ``sink`` lets the placebo arm write its draws to its own file without
+        # touching the draws behind Table 2
+        sink = draws if sink is None else sink
         acc = []
         for draw in range(args.repeats):
             y_c = y.copy()
             n = int(round(rate * len(df)))
-            pool = np.flatnonzero(vuln) if condition == "directional" else np.arange(len(df))
+            if condition == "directional":
+                pool = np.flatnonzero(vuln)
+            elif condition == "placebo":
+                pool = np.flatnonzero(~vuln)   # same magnitude, opposite target
+            else:
+                pool = np.arange(len(df))
             idx = rng.choice(pool, size=min(n, len(pool)), replace=False)
             y_c[idx] -= delta
             pred = fit_predict(df, y_c, args.trees, args.seed, args.model)
             m = metrics(df, pred, y, clean_top, priority_clean,
                         vuln, vuln_score, top_n, args.priority)
             acc.append(m)
-            draws.append(dict(condition=condition,
-                              contamination_pct=round(100 * rate, 1),
-                              delta_t=delta, draw=draw, model=args.model, **m))
+            sink.append(dict(condition=condition,
+                             contamination_pct=round(100 * rate, 1),
+                             delta_t=delta, draw=draw, model=args.model, **m))
         out = {k: round(float(np.mean([a[k] for a in acc])), 3) for k in acc[0]}
         return dict(condition=condition, contamination_pct=round(100 * rate, 1),
                     delta_t=delta, dropout_pct=round(out["dropout_pct"], 1),
@@ -209,6 +223,21 @@ def main(argv=None):
 
     out = pd.DataFrame(rows)
     out.to_csv(args.out, index=False, lineterminator="\n")
+
+    # placebo arm: same rate and shift, applied to the complement of the
+    # vulnerable set.  It is written to its own table because Table 2 keeps the
+    # two arms the paper compares; nothing above this line depends on it.
+    if args.placebo_out:
+        prows, pdraws = [], []
+        for rate in args.contamination:
+            prows.append(run_condition("placebo", rate, args.main_delta,
+                                       sink=pdraws))
+        pout = pd.DataFrame(prows)
+        pout.to_csv(args.placebo_out, index=False, lineterminator="\n")
+        if args.placebo_draws_out:
+            pd.DataFrame(pdraws).to_csv(args.placebo_draws_out, index=False,
+                                        lineterminator="\n")
+        print(pout.to_string(index=False))
 
     if args.draws_out:
         pd.DataFrame(draws).to_csv(args.draws_out, index=False,

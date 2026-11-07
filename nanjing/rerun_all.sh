@@ -31,13 +31,19 @@ for mb in 0.02 0.05 0.10; do
         --sr-scale 2.75e-05 --sr-offset -0.2 --utm-zone 50 \
         --bbox 118.70 31.92 119.20 32.22 --res 1000 \
         --out "$OUT/cells_m$mb.csv" --meta "$OUT/grid_metadata_m$mb.json"
+    # the reported mask also carries the placebo arm: same rate and shift,
+    # aimed at the non-vulnerable complement
+    extra=""
+    if [ "$mb" = "0.05" ]; then
+        extra="--placebo-out $OUT/placebo_heat_m0.05_r30.csv --placebo-draws-out $OUT/placebo_draws_heat_m0.05_r30.csv"
+    fi
     "$PY" model_and_poison.py \
         --cells "$OUT/cells_m$mb.csv" \
         --out "$OUT/conditions_heat_m${mb}_r30.csv" \
         --meta "$OUT/run_metadata_heat_m${mb}_r30.json" \
         --contamination 0.05 0.10 0.15 --delta 1 2 3 \
         --main-delta 2 --sweep-rate 0.10 \
-        --trees 300 --seed 7 --repeats 30 --priority heat
+        --trees 300 --seed 7 --repeats 30 --priority heat $extra
 done
 
 # population-weighted priority on the reported mask

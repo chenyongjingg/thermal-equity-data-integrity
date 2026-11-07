@@ -17,6 +17,7 @@ in `../README.md`. No value in these tables was typed by hand.
 | `city_summary.csv`, `cities/<name>/` | **Table S3** — the protocol repeated in eight cities; each `cities/<name>/` holds the grid, the condition table, the draws and the scene metadata |
 | `sensitivity_summary.csv` (`outputs/sens_*`) | **Table S4** — 500 m and 2 km grids, seeds 13 and 21, two other vulnerable-set definitions, and planting budgets of the top 5% and 20% |
 | `uncertainty_nanjing.csv`, `uncertainty_nanjing_contrasts.csv` | **Table S5** — mean, SD and 95% interval over the 30 draws, and the Welch interval for directional minus random |
+| `placebo_heat_m0.05_r30.csv`, `placebo_draws_heat_m0.05_r30.csv` | the placebo arm: the same rate and shift applied to the non-vulnerable complement |
 | `Figure_S2.png/.svg`, `Figure_S2_source.csv` | **Figure S2** — the directional and random drop-out in the eight cities with 95% intervals |
 | `CHECKSUMS.txt` | MD5 of every CSV and JSON above (PNG/SVG are shipped but not summed: their bytes depend on the matplotlib and freetype versions) |
 
@@ -78,6 +79,14 @@ Design choices, from `sensitivity_summary.csv` (10% contamination, ΔT = 2 °C):
 
 The direction survives all eight; the directional-to-random ratio stays between
 2.9 and 6.1.
+
+The placebo arm, from `placebo_heat_m0.05_r30.csv`, shifts the same share of
+labels by the same amount but selects them from the non-vulnerable complement:
+at 5%, 10% and 15% it removes 1.6%, 0.7% and 0.7% of vulnerable cells from the
+top decile (95% intervals 0.9–2.3, 0.0–1.4 and 0.3–1.1), below the random
+control at every rate. Corruption aimed away from the vulnerable set therefore
+costs them less than corruption aimed at random, which is what makes the
+directional arm informative rather than an artefact of how the metric is built.
 
 Nanjing appears in the city table as a self-check, not as an extra result:
 `cities/nanjing/cells.csv` is byte-identical to `cells_m0.05.csv` and

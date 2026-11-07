@@ -1,0 +1,4 @@
+condition,contamination_pct,delta_t,dropout_pct,jaccard,spearman_rho,bias_vulnerable_c,repeats
+placebo,5.0,2.0,1.6,0.897,0.64,0.03,30
+placebo,10.0,2.0,0.7,0.883,0.64,0.02,30
+placebo,15.0,2.0,0.7,0.832,0.65,0.01,30

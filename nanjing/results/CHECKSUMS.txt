@@ -67,6 +67,8 @@ b17183893b2d8238939be06f32787e79  model_rf.csv
 f60d8ad142caed65565683cfd1161a20  model_ridge.csv
 3aa1555d8bc1e2459f3db62b6e6abafa  model_ridge.json
 d12ecca23a058ad483a73b5fc9e4623f  model_summary.csv
+d8e5f8e57eff2ccf617fd6af425cf1d9  placebo_draws_heat_m0.05_r30.csv
+5708380afa3ac512757df8018d5848fc  placebo_heat_m0.05_r30.csv
 40ff489eae92faa9236b3ef794ff25ac  run_metadata_heat_m0.02_r30.json
 164712c578401908d71d2716a61d752e  run_metadata_heat_m0.05_r30.json
 d3b4e0e879c1b873465dd34b7652eb91  run_metadata_heat_m0.10_r30.json

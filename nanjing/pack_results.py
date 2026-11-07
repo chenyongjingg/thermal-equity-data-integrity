@@ -49,7 +49,8 @@ MODELS = ["rf", "gbm", "ridge", "knn"]
 ROBUST_TABLES = (
     ["model_summary.csv", "city_summary.csv", "sensitivity_summary.csv",
      "uncertainty_nanjing.csv", "uncertainty_nanjing_contrasts.csv",
-     "uncertainty_cities.csv", "uncertainty_cities_contrasts.csv"]
+     "uncertainty_cities.csv", "uncertainty_cities_contrasts.csv",
+     "placebo_heat_m0.05_r30.csv", "placebo_draws_heat_m0.05_r30.csv"]
     + ["model_{}.csv".format(m) for m in MODELS]
     + ["model_{}.json".format(m) for m in MODELS]
     + ["draws_{}.csv".format(m) for m in MODELS]
