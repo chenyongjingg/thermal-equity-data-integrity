@@ -1,15 +1,26 @@
-# Parameters of the Nanjing run described in Section 4.4.
+# Parameters of the Nanjing run described in Section 4.4 and Table 2.
 # This file is documentation, not read at run time: every value below is a
-# command-line argument of build_grid.py or model_and_poison.py (see the Usage
-# section of each script) and is passed explicitly by run.py / the Makefile.
+# command-line argument of build_grid.py or model_and_poison.py (see the
+# docstring of each script) and is passed explicitly by run.py and
+# rerun_all.sh.  Kept in step with those two entry points.
 
 bbox: [118.70, 31.92, 119.20, 32.22]   # W, S, E, N (EPSG:4326)
 crs: EPSG:32650                         # UTM zone 50N
 resolution_m: 1000
-min_built: 0.0                          # set > 0 to apply the built-up mask
+
+urban_mask:
+  source: GHS-BUILT-S R2023A
+  epoch: 2020
+  min_built: 0.05                       # 0.02 / 0.10 reported as sensitivity
+
+cloud_mask:
+  source: QA_PIXEL                      # bits 0-4: fill, dilated cloud, cirrus, cloud, shadow
+  max_cloud_frac: 0.10
 
 lst_scale: 0.00341802                   # Landsat C2 L2 ST_B10 DN -> K
 lst_offset: 149.0
+sr_scale: 2.75e-05                      # Landsat C2 L2 reflectance = DN * scale + offset
+sr_offset: -0.2
 
 vulnerable:
   population_percentile: 70
@@ -22,9 +33,13 @@ model:
   n_jobs: 1                             # do not change: reproducibility
   seed: 7
 
+priority: heat                          # predicted LST; heat_x_pop is the sensitivity
+
 contamination:
   rates: [0.05, 0.10, 0.15]
   deltas_c: [1.0, 2.0, 3.0]
   main_delta_c: 2.0
+  sweep_rate: 0.10
+  repeats: 30                           # independent draws averaged per condition
 
 top_fraction: 0.10

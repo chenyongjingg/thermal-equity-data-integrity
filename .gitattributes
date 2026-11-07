@@ -4,6 +4,7 @@
 * text=auto eol=lf
 *.csv -text
 synthetic/CHECKSUMS.txt -text
+nanjing/results/CHECKSUMS.txt -text
 *.png -text
 *.tif -text
 *.TIF -text

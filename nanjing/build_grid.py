@@ -38,6 +38,11 @@ from rasterio.warp import Resampling, reproject, transform_bounds
 UTM = "EPSG:32650"
 
 
+def utm_crs(zone):
+    """WGS 84 / UTM northern hemisphere, EPSG:32600 + zone."""
+    return "EPSG:{}".format(32600 + int(zone))
+
+
 def parse_args(argv=None):
     p = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     p.add_argument("--lst", required=True, help="Landsat thermal band (GeoTIFF)")
@@ -45,15 +50,26 @@ def parse_args(argv=None):
     p.add_argument("--nir", required=True, help="Near-infrared band (GeoTIFF)")
     p.add_argument("--pop", required=True, help="GHS-POP raster (persons per cell)")
     p.add_argument("--built", default=None, help="GHS-BUILT surface raster (m2 per cell)")
+    p.add_argument("--qa", default=None,
+                   help="Landsat QA_PIXEL band; cells containing flagged pixels are dropped")
+    p.add_argument("--max-cloud-frac", type=float, default=0.0,
+                   help="largest share of flagged pixels a cell may keep (default: none)")
     p.add_argument("--bbox", nargs=4, type=float, default=[118.70, 31.92, 119.20, 32.22],
                    metavar=("W", "S", "E", "N"))
     p.add_argument("--res", type=float, default=1000.0, help="grid resolution, metres")
+    p.add_argument("--utm-zone", type=int, default=50,
+                   help="UTM zone for the target grid (50 for Nanjing; EPSG:32600+zone)")
     p.add_argument("--lst-scale", type=float, default=0.00341802,
                    help="DN -> kelvin gain (Landsat C2 L2 ST_B10 default)")
     p.add_argument("--lst-offset", type=float, default=149.0,
                    help="DN -> kelvin offset (Landsat C2 L2 ST_B10 default)")
     p.add_argument("--no-kelvin", action="store_true",
                    help="thermal band is already in degrees Celsius")
+    p.add_argument("--sr-scale", type=float, default=1.0,
+                   help="DN -> reflectance gain for the red and NIR bands "
+                        "(Landsat C2 L2 default: 2.75e-05)")
+    p.add_argument("--sr-offset", type=float, default=0.0,
+                   help="DN -> reflectance offset (Landsat C2 L2 default: -0.2)")
     p.add_argument("--min-built", type=float, default=0.0,
                    help="drop cells whose built-up fraction is below this value")
     p.add_argument("--out", default="outputs/cells.csv")
@@ -69,16 +85,16 @@ def read_raster(path):
         return arr, ds.transform, ds.crs
 
 
-def target_grid(bbox, res):
+def target_grid(bbox, res, crs):
     w, s, e, n = bbox
-    xmin, ymin, xmax, ymax = transform_bounds("EPSG:4326", UTM, w, s, e, n)
+    xmin, ymin, xmax, ymax = transform_bounds("EPSG:4326", crs, w, s, e, n)
     width = int(np.ceil((xmax - xmin) / res))
     height = int(np.ceil((ymax - ymin) / res))
     transform = from_origin(xmin, ymax, res, res)
     return transform, height, width
 
 
-def warp_to(arr, src_transform, src_crs, dst_transform, shape, resampling):
+def warp_to(arr, src_transform, src_crs, dst_transform, dst_crs, shape, resampling):
     """Reproject one band to the target grid; NaN outside the source footprint."""
     dst = np.full(shape, np.nan, dtype="float64")
     reproject(
@@ -87,7 +103,7 @@ def warp_to(arr, src_transform, src_crs, dst_transform, shape, resampling):
         src_transform=src_transform,
         src_crs=src_crs,
         dst_transform=dst_transform,
-        dst_crs=UTM,
+        dst_crs=dst_crs,
         resampling=resampling,
         src_nodata=np.nan,
         dst_nodata=np.nan,
@@ -116,6 +132,10 @@ def main(argv=None):
     nir, nir_t, nir_crs = read_raster(args.nir)
     pop, pop_t, pop_crs = read_raster(args.pop)
 
+    # surface reflectance = DN * gain + offset; NDVI is computed on reflectance
+    # because an offset does not cancel in the ratio
+    red = red * args.sr_scale + args.sr_offset
+    nir = nir * args.sr_scale + args.sr_offset
     with np.errstate(invalid="ignore", divide="ignore"):
         ndvi = (nir - red) / (nir + red)
     ndvi[~np.isfinite(ndvi)] = np.nan
@@ -125,12 +145,14 @@ def main(argv=None):
         pop_density = pop / pop_area          # persons per m2
     pop_density[~np.isfinite(pop_density)] = np.nan
 
-    dst_t, height, width = target_grid(args.bbox, args.res)
+    dst_crs = utm_crs(args.utm_zone)
+    dst_t, height, width = target_grid(args.bbox, args.res, dst_crs)
     shape = (height, width)
 
-    lat_c = warp_to(lst, lst_t, lst_crs, dst_t, shape, Resampling.average)
-    ndvi_c = warp_to(ndvi, red_t, red_crs, dst_t, shape, Resampling.average)
-    dens_c = warp_to(pop_density, pop_t, pop_crs, dst_t, shape, Resampling.average)
+    lat_c = warp_to(lst, lst_t, lst_crs, dst_t, dst_crs, shape, Resampling.average)
+    ndvi_c = warp_to(ndvi, red_t, red_crs, dst_t, dst_crs, shape, Resampling.average)
+    dens_c = warp_to(pop_density, pop_t, pop_crs, dst_t, dst_crs, shape,
+                     Resampling.average)
     built_c = np.full(shape, np.nan)
     if args.built:
         built, b_t, b_crs = read_raster(args.built)
@@ -138,7 +160,20 @@ def main(argv=None):
         with np.errstate(invalid="ignore", divide="ignore"):
             frac = built / b_area
         frac[~np.isfinite(frac)] = np.nan
-        built_c = warp_to(frac, b_t, b_crs, dst_t, shape, Resampling.average)
+        built_c = warp_to(frac, b_t, b_crs, dst_t, dst_crs, shape, Resampling.average)
+
+    cloud_c = np.full(shape, np.nan)
+    if args.qa:
+        qa, q_t, q_crs = read_raster(args.qa)
+        qa = np.nan_to_num(qa, nan=0.0).astype("int64")
+        # Collection 2 QA_PIXEL: bit 0 fill, 1 dilated cloud, 2 cirrus,
+        # 3 cloud, 4 cloud shadow
+        flagged = np.zeros(qa.shape, dtype="float64")
+        for bit in (0, 1, 2, 3, 4):
+            flagged += ((qa >> bit) & 1).astype("float64")
+        flagged = (flagged > 0).astype("float64")
+        cloud_c = warp_to(flagged, q_t, q_crs, dst_t, dst_crs, shape,
+                          Resampling.average)
 
     rows, cols = np.mgrid[0:height, 0:width]
     xs, ys = rasterio.transform.xy(dst_t, rows, cols, offset="center")
@@ -155,11 +190,18 @@ def main(argv=None):
         "ndvi": ndvi_c.ravel(),
         "pop": np.maximum(dens_c.ravel(), 0.0) * (args.res ** 2),
         "built_frac": built_c.ravel(),
+        "cloud_frac": cloud_c.ravel(),
     })
 
     before = len(cells)
     cells = cells.dropna(subset=["lst_c", "ndvi", "pop"]).copy()
     dropped_nan = before - len(cells)
+
+    dropped_cloud = 0
+    if args.qa:
+        keep = cells["cloud_frac"].fillna(1.0) <= args.max_cloud_frac
+        dropped_cloud = int((~keep).sum())
+        cells = cells[keep].copy()
 
     dropped_built = 0
     if args.min_built > 0:
@@ -167,41 +209,52 @@ def main(argv=None):
         dropped_built = int((~keep).sum())
         cells = cells[keep].copy()
 
+    # physically impossible NDVI comes from fill or saturated pixels
+    keep = cells["ndvi"].between(-1.0, 1.0)
+    dropped_ndvi = int((~keep).sum())
+    cells = cells[keep].copy()
+
     if args.no_kelvin:
         pass
     else:
         cells["lst_c"] = cells["lst_c"] * args.lst_scale + args.lst_offset - 273.15
 
-    lonlat = rasterio.warp.transform(UTM, "EPSG:4326",
+    lonlat = rasterio.warp.transform(dst_crs, "EPSG:4326",
                                      cells["x_utm"].to_numpy(),
                                      cells["y_utm"].to_numpy())
     cells["lon"] = lonlat[0]
     cells["lat"] = lonlat[1]
     cells = cells[["cell_id", "lon", "lat", "x_utm", "y_utm",
-                   "lst_c", "ndvi", "pop", "built_frac"]]
-    cells.to_csv(args.out, index=False)
+                   "lst_c", "ndvi", "pop", "built_frac", "cloud_frac"]]
+    cells.to_csv(args.out, index=False, lineterminator="\n")
 
     meta = {
         "bbox_wsen": args.bbox,
-        "crs": UTM,
+        "crs": dst_crs,
         "resolution_m": args.res,
         "grid_height": height,
         "grid_width": width,
         "cells_in_grid": int(height * width),
         "cells_written": int(len(cells)),
         "dropped_missing_data": int(dropped_nan),
+        "dropped_cloud": dropped_cloud,
+        "max_cloud_frac": args.max_cloud_frac if args.qa else None,
+        "dropped_implausible_ndvi": dropped_ndvi,
         "dropped_below_min_built": dropped_built,
         "min_built": args.min_built,
         "lst_input": os.path.basename(args.lst),
         "lst_scale": None if args.no_kelvin else args.lst_scale,
         "lst_offset": None if args.no_kelvin else args.lst_offset,
+        "sr_scale": args.sr_scale,
+        "sr_offset": args.sr_offset,
         "pop_input": os.path.basename(args.pop),
     }
-    with open(args.meta, "w", encoding="utf-8") as fh:
+    with open(args.meta, "w", encoding="utf-8", newline="\n") as fh:
         json.dump(meta, fh, indent=2)
 
     print(f"cells written: {len(cells)} of {height * width} grid cells "
           f"({dropped_nan} dropped for missing LST/NDVI/population, "
+          f"{dropped_cloud} cloudy, {dropped_ndvi} implausible NDVI, "
           f"{dropped_built} below built-up threshold)")
     print(f"wrote {args.out} and {args.meta}")
     return 0

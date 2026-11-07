@@ -101,7 +101,7 @@ def main(argv=None):
         save_both(fig, os.path.join(args.outdir, "Figure_3.png"))
 
     # ---- Figure 4: dose-response ------------------------------------------
-    fig, axes = plt.subplots(1, 2, figsize=(TEXT_WIDTH_IN, 2.5))
+    fig, axes = plt.subplots(1, 3, figsize=(TEXT_WIDTH_IN, 2.4))
     ax = axes[0]
     if len(dir_main):
         ax.plot(dir_main.contamination_pct, dir_main.dropout_pct, marker="o",
@@ -129,7 +129,39 @@ def main(argv=None):
     ax.legend(frameon=False, loc="lower left", handlelength=1.6)
     ax.set_title("(b) Stability of the list", fontsize=8, fontweight="bold", loc="left")
     ax.tick_params(width=0.6, length=2.5)
-    fig.tight_layout(w_pad=1.8)
+
+    # shift-size sweep: directional rows at one contamination rate, all shifts
+    ax = axes[2]
+    main_delta = d.delta_t.mode().iloc[0]
+    shifted = d[(d.condition == "directional") & (d.delta_t != main_delta)]
+    sweep = d[(d.condition == "directional")].copy()
+    if len(shifted):
+        sweep_rate = shifted.contamination_pct.mode().iloc[0]
+        sweep = sweep[sweep.contamination_pct == sweep_rate]
+    sweep = sweep.sort_values("delta_t")
+    if len(sweep) > 1:
+        ax.plot(sweep.delta_t, sweep.dropout_pct, marker="o", markersize=3.4,
+                linewidth=1.2, color=RED, label="Removed (left)")
+        ax.set_xlabel("Downward shift $\\Delta T$ (°C)")
+        ax.set_ylabel("Vulnerable cells removed\nfrom top decile (%)")
+        ax.set_ylim(bottom=0)
+        ax2 = ax.twinx()
+        ax2.plot(sweep.delta_t, sweep.spearman_rho, marker="^", markersize=3.4,
+                 linewidth=1.0, linestyle="--", color=GREY,
+                 label="$\\rho$ (right)")
+        ax2.set_ylabel("Spearman $\\rho$", color=GREY)
+        ax2.tick_params(axis="y", colors=GREY, width=0.6, length=2.5)
+        ax2.spines["right"].set_visible(True)
+        ax2.spines["right"].set_color(GREY)
+        ax2.spines["top"].set_visible(False)
+        ax2.set_ylim(0, 1)
+        h1, l1 = ax.get_legend_handles_labels()
+        h2, l2 = ax2.get_legend_handles_labels()
+        ax.legend(h1 + h2, l1 + l2, frameon=False, loc="upper left",
+                  handlelength=1.8)
+        ax.set_title("(c) Shift size", fontsize=8, fontweight="bold", loc="left")
+        ax.tick_params(width=0.6, length=2.5)
+    fig.tight_layout(w_pad=2.0)
     save_both(fig, os.path.join(args.outdir, "Figure_4.png"))
 
     print(f"figures written to {args.outdir}")

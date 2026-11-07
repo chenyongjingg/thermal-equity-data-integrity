@@ -9,6 +9,7 @@ data/raw/
 nanjing/outputs/*
 !nanjing/outputs/.gitkeep
 synthetic/run*.log
+nanjing/rerun_*.log
 
 # python
 __pycache__/

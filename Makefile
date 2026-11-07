@@ -5,6 +5,12 @@ RATES   ?= 0.05 0.10 0.15
 DELTAS  ?= 1 2 3
 TREES   ?= 300
 SEED    ?= 7
+REPEATS ?= 30
+PRIORITY ?= heat
+MINBUILT ?= 0.05
+MAXCLOUD ?= 0.10
+SRSCALE ?= 2.75e-05
+SROFFSET ?= -0.2
 
 GRID    = nanjing/outputs/cells.csv
 GRIDM   = nanjing/outputs/grid_metadata.json
@@ -24,23 +30,23 @@ synthetic:
 checksums:
 	md5sum -c synthetic/CHECKSUMS.txt
 
-## Nanjing experiment: needs LST, RED, NIR and POP in the environment
+## Nanjing experiment: needs LST, RED, NIR, QA, POP and BUILT in the environment
 nanjing: grid model figures
 
 grid: $(GRID)
 
 $(GRID):
-	$(PY) nanjing/build_grid.py --lst "$(LST)" --red "$(RED)" --nir "$(NIR)" --pop "$(POP)" --bbox $(BBOX) --res $(RES) --out $(GRID) --meta $(GRIDM)
+	$(PY) nanjing/build_grid.py --lst "$(LST)" --red "$(RED)" --nir "$(NIR)" --qa "$(QA)" --max-cloud-frac $(MAXCLOUD) --pop "$(POP)" --built "$(BUILT)" --min-built $(MINBUILT) --sr-scale $(SRSCALE) --sr-offset $(SROFFSET) --bbox $(BBOX) --res $(RES) --out $(GRID) --meta $(GRIDM)
 
 model: $(CONDS)
 
 $(CONDS): $(GRID)
-	$(PY) nanjing/model_and_poison.py --cells $(GRID) --out $(CONDS) --meta $(CONDM) --contamination $(RATES) --delta $(DELTAS) --main-delta 2 --trees $(TREES) --seed $(SEED)
+	$(PY) nanjing/model_and_poison.py --cells $(GRID) --out $(CONDS) --meta $(CONDM) --contamination $(RATES) --delta $(DELTAS) --main-delta 2 --sweep-rate 0.10 --repeats $(REPEATS) --priority $(PRIORITY) --trees $(TREES) --seed $(SEED)
 
 figures: $(CONDS)
 	$(PY) nanjing/make_figures.py --conditions $(CONDS) --outdir nanjing/outputs
 
-## Smoke test: full pipeline on a 16x16 raster stack, no downloads
+## Smoke test: full pipeline on a 40x40 raster stack, no downloads
 test:
 	$(PY) -m pytest nanjing/tests -q
 
