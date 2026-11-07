@@ -16,7 +16,7 @@ in `../README.md`. No value in these tables was typed by hand.
 | `model_summary.csv` | **Table S2** — the same grid and protocol under four estimators (`model_*.csv` hold the full per-estimator condition tables, `draws_*.csv` the 30 draws behind every mean) |
 | `city_summary.csv`, `cities/<name>/` | **Table S3** — the protocol repeated in eight cities; each `cities/<name>/` holds the grid, the condition table, the draws and the scene metadata |
 | `sensitivity_summary.csv` (`outputs/sens_*`) | **Table S4** — 500 m and 2 km grids, seeds 13 and 21, two other vulnerable-set definitions, and planting budgets of the top 5% and 20% |
-| `uncertainty_nanjing.csv`, `uncertainty_nanjing_contrasts.csv` | **Table S5** — mean, SD and 95% interval over the 30 draws, and the Welch interval for directional minus random |
+| `uncertainty_nanjing.csv`, `uncertainty_nanjing_contrasts.csv` | **Table S5** — mean, SD and 95% interval over the 30 draws for every condition and estimator, the placebo arm included, plus the Welch interval for directional minus random |
 | `placebo_heat_m0.05_r30.csv`, `placebo_draws_heat_m0.05_r30.csv` | the placebo arm: the same rate and shift applied to the non-vulnerable complement |
 | `Figure_S2.png/.svg`, `Figure_S2_source.csv` | **Figure S2** — the directional and random drop-out in the eight cities with 95% intervals |
 | `CHECKSUMS.txt` | MD5 of every CSV and JSON above (PNG/SVG are shipped but not summed: their bytes depend on the matplotlib and freetype versions) |
