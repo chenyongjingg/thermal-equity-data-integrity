@@ -1,0 +1,18 @@
+{
+  "date": "2021-09",
+  "bbox": [
+    118.7,
+    31.92,
+    119.2,
+    32.22
+  ],
+  "utm_zone": 50,
+  "ghs_tile": "R6_C30",
+  "scene": "LC08_L2SP_120038_20210918_02_T1",
+  "scene_cloud_pct": 1.85,
+  "scene_datetime": "2021-09-18T02:37:39.533381Z",
+  "min_built": 0.05,
+  "priority": "heat",
+  "model": "rf",
+  "repeats": 30
+}

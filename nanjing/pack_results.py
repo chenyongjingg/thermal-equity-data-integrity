@@ -50,6 +50,8 @@ ROBUST_TABLES = (
     ["model_summary.csv", "city_summary.csv", "sensitivity_summary.csv",
      "uncertainty_nanjing.csv", "uncertainty_nanjing_contrasts.csv",
      "uncertainty_cities.csv", "uncertainty_cities_contrasts.csv",
+     "date_summary.csv", "uncertainty_dates.csv",
+     "uncertainty_dates_contrasts.csv",
      "placebo_heat_m0.05_r30.csv", "placebo_draws_heat_m0.05_r30.csv"]
     + ["model_{}.csv".format(m) for m in MODELS]
     + ["model_{}.json".format(m) for m in MODELS]
@@ -58,6 +60,9 @@ ROBUST_TABLES = (
 ROBUST_FIGS = ["Figure_S2.png", "Figure_S2.svg", "Figure_S2_source.csv"]
 CITY_FILES = ["cells.csv", "conditions.csv", "draws.csv",
               "grid_metadata.json", "run_metadata.json", "city.json"]
+DATE_FILES = ["cells.csv", "conditions.csv", "draws.csv",
+              "placebo.csv", "placebo_draws.csv",
+              "grid_metadata.json", "run_metadata.json", "date.json"]
 
 
 def md5(path):
@@ -103,6 +108,16 @@ def main(argv=None):
                 if not os.path.exists(src):
                     raise SystemExit("missing {} — rerun run_cities.py".format(src))
                 copy(src, os.path.join(RES, "cities", c[len("city_"):], name),
+                     copied)
+        dates = sorted(d for d in os.listdir(OUT)
+                       if d.startswith("date_") and
+                       os.path.isdir(os.path.join(OUT, d)))
+        for dname in dates:
+            for name in DATE_FILES:
+                src = os.path.join(OUT, dname, name)
+                if not os.path.exists(src):
+                    raise SystemExit("missing {} — rerun run_dates.py".format(src))
+                copy(src, os.path.join(RES, "dates", dname[len("date_"):], name),
                      copied)
 
     # checksums cover every shipped table and metadata file, not only the ones

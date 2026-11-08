@@ -1,0 +1,26 @@
+{
+  "bbox_wsen": [
+    118.7,
+    31.92,
+    119.2,
+    32.22
+  ],
+  "crs": "EPSG:32650",
+  "resolution_m": 1000.0,
+  "grid_height": 35,
+  "grid_width": 48,
+  "cells_in_grid": 1680,
+  "cells_written": 687,
+  "dropped_missing_data": 0,
+  "dropped_cloud": 615,
+  "max_cloud_frac": 0.1,
+  "dropped_implausible_ndvi": 0,
+  "dropped_below_min_built": 378,
+  "min_built": 0.05,
+  "lst_input": "2021-05__ST_B10.tif",
+  "lst_scale": 0.00341802,
+  "lst_offset": 149.0,
+  "sr_scale": 2.75e-05,
+  "sr_offset": -0.2,
+  "pop_input": "GHS_POP_E2020_GLOBE_R2023A_4326_30ss_V1_0_R6_C30.tif"
+}

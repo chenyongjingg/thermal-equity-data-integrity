@@ -11,6 +11,7 @@ that read on their own, so a reader can open them without the code:
   Table_S4.csv  design-choice sensitivity (resolution, seed, vulnerable set)
   Table_S5.csv  mean and 95% interval over the 30 draws, plus the
                 directional-minus-random contrast
+  Table_S6.csv  the same city and protocol on three further Landsat dates
 
     python export_supplementary.py --out ../submission/supplementary
 """
@@ -115,7 +116,31 @@ def main(argv=None):
     u.to_csv(os.path.join(args.out, "Table_S5.csv"), index=False,
              lineterminator="\n", na_rep="")
 
-    for name in ("Table_S2.csv", "Table_S3.csv", "Table_S4.csv", "Table_S5.csv"):
+    # ---- Table S6: acquisition dates for one city ----------------------
+    d = read_rows(os.path.join(args.work, "date_summary.csv"))
+    s6 = pd.DataFrame({
+        "date": d.date,
+        "scene": d.scene,
+        "scene_date": d.scene_datetime,
+        "scene_cloud_pct": d.scene_cloud_pct,
+        "cells": d.cells,
+        "vulnerable_cells": d.vulnerable,
+        "vulnerable_share_top_pct": d.vulnerable_share_top_pct,
+        "clean_rho": d.rho_clean,
+        "dropout_5_directional": d.dir_drop5,
+        "dropout_5_random": d.rnd_drop5,
+        "dropout_10_directional": d.dir_drop10,
+        "dropout_10_random": d.rnd_drop10,
+        "dropout_15_directional": d.dir_drop15,
+        "dropout_15_random": d.rnd_drop15,
+        "dropout_10_placebo": d.get("plc_drop10"),
+        "gap_10": d.gap_10,
+    })
+    s6.to_csv(os.path.join(args.out, "Table_S6.csv"), index=False,
+              lineterminator="\n", na_rep="")
+
+    for name in ("Table_S2.csv", "Table_S3.csv", "Table_S4.csv", "Table_S5.csv",
+                 "Table_S6.csv"):
         print("wrote", os.path.join(args.out, name))
     return 0
 

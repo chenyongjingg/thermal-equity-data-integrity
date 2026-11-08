@@ -8,8 +8,8 @@ abstract: >-
   Nanjing, China, a synthetic replication, and robustness runs that repeat the
   experiment under four estimators, in eight Chinese cities, and under
   alternative grid resolutions, seeds, vulnerable-set definitions and
-  planting budgets, plus a placebo arm that aims the same corruption away
-  from the vulnerable cells.
+  planting budgets, three further Landsat dates for the same city, and a
+  placebo arm that aims the same corruption away from the vulnerable cells.
 type: software
 authors:
   - family-names: Xue
@@ -20,7 +20,7 @@ authors:
     given-names: Songze
 repository-code: "https://github.com/chenyongjingg/thermal-equity-data-integrity"
 license: MIT
-version: 0.3.3
+version: 0.4.0
 date-released: "2026-11-08"
 keywords:
   - urban forestry

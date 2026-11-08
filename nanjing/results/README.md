@@ -18,6 +18,7 @@ in `../README.md`. No value in these tables was typed by hand.
 | `sensitivity_summary.csv` (`outputs/sens_*`) | **Table S4** — 500 m and 2 km grids, seeds 13 and 21, two other vulnerable-set definitions, and planting budgets of the top 5% and 20% |
 | `uncertainty_nanjing.csv`, `uncertainty_nanjing_contrasts.csv` | **Table S5** — mean, SD and 95% interval over the 30 draws for every condition and estimator, the placebo arm included, plus the Welch interval for directional minus random |
 | `placebo_heat_m0.05_r30.csv`, `placebo_draws_heat_m0.05_r30.csv` | the placebo arm: the same rate and shift applied to the non-vulnerable complement |
+| `date_summary.csv`, `dates/<date>/` | **Table S6** — the same city and protocol on three further Landsat dates; each `dates/<date>/` holds the grid, the condition table, the placebo arm, the draws and the scene metadata |
 | `Figure_S2.png/.svg`, `Figure_S2_source.csv` | **Figure S2** — the directional and random drop-out in the eight cities with 95% intervals |
 | `CHECKSUMS.txt` | MD5 of every CSV and JSON above (PNG/SVG are shipped but not summed: their bytes depend on the matplotlib and freetype versions) |
 
@@ -79,6 +80,21 @@ Design choices, from `sensitivity_summary.csv` (10% contamination, ΔT = 2 °C):
 
 The direction survives all eight; the directional-to-random ratio stays between
 2.9 and 6.1.
+
+Dates for one city, from `date_summary.csv` (10% contamination, ΔT = 2 °C):
+
+| Date | Scene | Cloud (%) | Cells / vulnerable | Clean rho | Directional | Random | Placebo |
+|---|---|---|---|---|---|---|---|
+| 2021-05-29 | LC08_L2SP_120038_20210529_02_T1 | 31.1 | 687 / 149 | 0.52 | 31.2 | 8.7 | 1.3 |
+| 2021-08-01 | LC08_L2SP_120038_20210801_02_T1 (the paper) | 12.9 | 727 / 162 | 0.64 | 35.2 | 9.0 | 1.6 |
+| 2021-09-18 | LC08_L2SP_120038_20210918_02_T1 | 1.9 | 938 / 224 | 0.72 | 49.1 | 14.5 | 0.3 |
+| 2021-10-04 | LC08_L2SP_120038_20211004_02_T1 | 0.0 | 1066 / 240 | 0.55 | 42.7 | 9.5 | 0.0 |
+
+The gap is 22.5 to 34.6 points across the three further dates (95% intervals
+20.6-24.3, 31.9-37.3 and 29.8-36.5), and the placebo arm is below the random
+control on every date. The date changes the background the experiment runs
+against -- the clean decile is 71.0%, 57.4% and 33.6% vulnerable across the
+three scenes -- without removing the asymmetry.
 
 The placebo arm, from `placebo_heat_m0.05_r30.csv`, shifts the same share of
 labels by the same amount but selects them from the non-vulnerable complement:

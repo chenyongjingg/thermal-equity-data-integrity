@@ -72,9 +72,11 @@ def main(argv=None):
         f = pd.read_csv(p)
         if args.per_file:
             label = os.path.splitext(os.path.basename(p))[0]
-            if label == "draws":            # city_<name>/draws.csv
+            if label in ("draws", "placebo_draws"):
+                # city_<name>/draws.csv, or date_<tag>/placebo_draws.csv: the
+                # group is the directory, not the file
                 label = os.path.basename(os.path.dirname(os.path.abspath(p)))
-            for prefix in ("draws_", "city_"):
+            for prefix in ("draws_", "city_", "date_"):
                 if label.startswith(prefix):
                     label = label[len(prefix):]
             f["group"] = label

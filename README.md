@@ -60,7 +60,9 @@ inside `nanjing/` (about 25 min, mostly random-forest fits).
 The robustness runs are separate drivers because they change one input at a
 time and cost real time: `sh run_models.sh` (four estimators, ~35 min),
 `python run_cities.py` (eight cities, downloads one Landsat window per city),
-`python run_sensitivity.py` (eight grid, seed, threshold and budget configurations, ~2 h).
+`python run_sensitivity.py` (eight grid, seed, threshold and budget configurations, ~2 h),
+`python run_dates.py` (three further Landsat dates for Nanjing, ~20 min once the
+windows are downloaded).
 Each is described in `nanjing/README.md`.
 
 ### What the reported run is
@@ -98,7 +100,7 @@ is reported in Section 4.4 and is in
 
 ### Robustness runs
 
-Five further sets of runs change one part of the design at a time. They are
+Six further sets of runs change one part of the design at a time. They are
 described in the Supplementary Materials of the paper and are all shipped here.
 
 | Check | What changes | Driver | Output |
@@ -108,13 +110,15 @@ described in the Supplementary Materials of the paper and are all shipped here.
 | Grid, seeds and thresholds | 500 m and 2 km grids, estimator seeds 13 and 21, two other vulnerable-set definitions, planting budgets of the top 5% and 20% | `run_sensitivity.py` | `sensitivity_summary.csv` (**Table S4**) |
 | Draw-level uncertainty | 95% t intervals per condition, Welch intervals for directional minus random | `uncertainty.py` | `uncertainty_nanjing*.csv` (**Table S5**) |
 | Placebo arm | the same rate and shift aimed at the non-vulnerable complement | `model_and_poison.py --placebo-out` | `placebo_heat_m0.05_r30.csv` |
+| Acquisition dates | the same city and protocol on three further Landsat dates, so that scene date is separated from city identity | `run_dates.py` | `date_summary.csv` (**Table S6**), `dates/` |
 
 ## What is and is not in this repository
 
 - **Included:** all analysis code; the synthetic results; the Nanjing
   cell-level grid, condition tables, run metadata and figures under
-  `nanjing/results/`; the scene identification; and the five robustness sets
-  (estimators, eight cities, design choices, draw-level intervals, placebo arm)
+  `nanjing/results/`; the scene identification; and the six robustness sets
+  (estimators, eight cities, design choices, draw-level intervals,
+  placebo arm, acquisition dates)
   with the per-city grids and scene metadata under `nanjing/results/cities/`.
 - **Not included:** the raw satellite and population rasters — large, and better
   obtained from the providers, which keeps their provenance unambiguous.
@@ -140,6 +144,7 @@ described in the Supplementary Materials of the paper and are all shipped here.
 | Figure S2 (cities, 95% intervals) | `nanjing/results/Figure_S2.png` |
 | Table S4 (resolution, seed, thresholds) | `nanjing/results/sensitivity_summary.csv` |
 | Table S5 (draw-level intervals and contrasts) | `nanjing/results/uncertainty_nanjing.csv`, `uncertainty_nanjing_contrasts.csv` |
+| Table S6 (acquisition dates for one city) | `nanjing/results/date_summary.csv`, `dates/<date>/` |
 
 ## Reproducibility notes
 
